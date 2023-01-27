@@ -2,6 +2,7 @@
 
 ## local testing
     python3 main.py
+    
     ./benchmarks.sh local 10 0 1
 
 ## GCP Deploy
@@ -9,9 +10,20 @@
 
 ## remote testing
     ./benchmarks.sh remote 10 0 1
+    
     ./benchmarks.sh remote 1000 1 0
 
 
 ## commands issued on this project
-gcloud services enable pubsub.googleapis.com
-pip install --upgrade google-cloud-pubsub
+* gcloud auth application-default login
+* gcloud services enable pubsub.googleapis.com
+* pip install --upgrade google-cloud-pubsub
+
+
+## pubsub commands
+* gcloud services enable cloudprofiler.googleapis.com
+* gcloud pubsub topics create test-topic
+* gcloud pubsub subscriptions list
+* gcloud pubsub subscriptions create py-test-subscription --topic test-topic
+* gcloud pubsub subscriptions create py-test-subscription2 --topic test-topic
+* gcloud pubsub subscriptions create py-test-push --topic test-topic --push-endpoint https://docker-brandx-api-py-jflup3ylrq-wn.a.run.app/pubSubProcessBCImport

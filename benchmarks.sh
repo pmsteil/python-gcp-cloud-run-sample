@@ -9,9 +9,10 @@
 # if first argument is -h or --help, print usage
 if [ "$1" = "local" ]; then
     baseuri=http://127.0.0.1:8080
+    service=$1
 elif [ "$1" = "remote" ]; then
     baseuri=https://docker-brandx-api-py-jflup3ylrq-wn.a.run.app
-#elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    service=$1    
 else
     clear
     echo "-------------------------------------------------------------"
@@ -33,27 +34,14 @@ fi
 
 
 
-# accept cli arg called local to set baseuri to localhost
-# if [ "$1" = "local" ]; then
-#     baseuri=http://127.0.0.1:8080
-# fi
-
-# if [ "$1" = "remote" ]; then
-#     baseuri=https://docker-brandx-api-py-jflup3ylrq-wn.a.run.app
-# fi
-
-# if [ "$1" = "" ]; then
-#     $1 = "-h"
-# fi
-
-
 
 # create array of uris to test
 declare -a uris
 uris[0]=$baseuri/
 uris[1]=$baseuri/hello
 uris[2]=$baseuri/pubSubProcessBCImport
-# uris[3]=$baseuri/pubSubProcessMi9Import
+uris[3]=$baseuri/pubSubProcessMi9Import
+uris[4]=$baseuri/createPubSubMessages
 
 
 
