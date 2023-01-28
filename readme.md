@@ -6,21 +6,32 @@
 * should we use the locally built image and upload to gcloud?
     * gcloud beta run deploy [SERVICE_NAME] --image gs://[BUCKET_NAME]/[IMAGE_NAME]
 
-## local testing
-    <!-- python3 main.py -->
-    local/run
-    local/test local
+## local docker commands
+    local/run - build and run the project in local docker
+    local/stop - stop the container
+    local/start - start it again
+    local/bash - get a command line to it
+    local/logs - display running logs
     
     ./benchmarks.sh local 10 0 1
 
-## GCP Deploy
-    ./deploy.sh
+
+## local testing
+    test/hello local
+    test/post local
+    test/benchmarks local
+    test/benchmarks local 10 0 1    
+    test/benchmarks local 1000 1 0
 
 ## remote testing
-    ./benchmarks.sh remote 10 0 1
-    
-    ./benchmarks.sh remote 1000 1 0
+    test/hello remote
+    test/post remote
+    test/benchmarks remote
+    test/benchmarks remote 10 0 1    
+    test/benchmarks remote 1000 1 0
 
+## GCP Deploy
+    ./deploy.sh
 
 ## commands issued on this project
 * gcloud auth application-default login

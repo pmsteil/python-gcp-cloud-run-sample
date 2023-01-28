@@ -1,10 +1,5 @@
-# benchmarks.sh
+# test/benchmarks
 
-# Example usage:
-# ./benchmarks.sh (default 100 iterations, runs both parallel and sequential)
-# ./benchmarks.sh 1000 1 (runs 1000 iterations, runs both parallel and sequential)
-# ./benchmarks.sh 100 1 0 (runs 100 iterations, runs only parallel)
-# ./benchmarks.sh 100 0 1 (runs 100 iterations, runs only sequential)
 
 # if first argument is -h or --help, print usage
 if [ "$1" = "local" ]; then
@@ -16,17 +11,16 @@ elif [ "$1" = "remote" ]; then
 else
     clear
     echo "-------------------------------------------------------------"
-
     echo "Usage: ./benchmarks.sh [iterations] [parallel] [sequential]"
-    echo "iterations: number of iterations to run (default 100)"
+    echo "iterations: number of iterations to run (default 10)"
     echo "parallel: 1 to run parallel requests, 0 to skip (default 1)"
     echo "sequential: 1 to run sequential requests, 0 to skip (default 1)"
     echo 
     echo "Example usage:"
-    echo "./benchmarks.sh (default 100 iterations, runs both parallel and sequential)"
-    echo "./benchmarks.sh 1000 1 (runs 1000 iterations, runs both parallel and sequential)"
-    echo "./benchmarks.sh 100 1 0 (runs 100 iterations, runs only parallel)"
-    echo "./benchmarks.sh 100 0 1 (runs 100 iterations, runs only sequential)"    
+    echo "./benchmarks.sh local (default 10 iterations, runs both parallel and sequential)"
+    echo "./benchmarks.sh local 1000 1 (runs 1000 iterations, runs both parallel and sequential)"
+    echo "./benchmarks.sh local 100 1 0 (runs 100 iterations, runs only parallel)"
+    echo "./benchmarks.sh remote 100 0 1 (runs 100 iterations, runs only sequential)"    
     echo "-------------------------------------------------------------"
 
     exit 0

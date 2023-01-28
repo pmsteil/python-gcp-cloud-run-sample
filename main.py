@@ -10,8 +10,12 @@ from flask import Flask, render_template,jsonify,request
 from google.cloud import pubsub_v1
 # from concurrent.futures import TimeoutError
 
+# get environment variable for project_id
+project_id = os.environ.get("PROJECT_ID", "project_id")
 
-project_id="moonlit-ceiling-347716"
+
+
+
 app = Flask(__name__)
 
 

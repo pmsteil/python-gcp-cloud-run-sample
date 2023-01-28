@@ -74,7 +74,7 @@ echo "# generated $bashcmd" > $bashcmd
 echo "docker exec -it $container_id /bin/bash \$1" >> $bashcmd
 chmod +x $bashcmd
 
-logscmd="lbin/log"
+logscmd="lbin/logs"
 echo "# generated $logscmd" > $logscmd
 echo "docker logs --follow $container_id" >> $logscmd
 chmod +x $logscmd
