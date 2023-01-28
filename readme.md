@@ -3,6 +3,7 @@
 ## todos
 * setup pytest unit testing
 * should we use the locally built image and upload to gcloud?
+    * gcloud beta run deploy [SERVICE_NAME] --image gs://[BUCKET_NAME]/[IMAGE_NAME]
 
 ## local testing
     <!-- python3 main.py -->

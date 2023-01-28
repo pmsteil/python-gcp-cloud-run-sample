@@ -4,7 +4,11 @@ clear
 image_name=docker-brandx-api-py
 
 
-
+echo "----------------------------------------------------------------------------"
+echo "| Stopping running docker container...                                     |"
+echo "----------------------------------------------------------------------------"
+#  docker stop $(docker ps -a -q)
+lbin/stop
 
 
 
@@ -84,8 +88,11 @@ chmod +x $logscmd
 
 
 
-echo "Use any of the following commands..."
-echo "   ./test-post.sh local"
+echo "Use any of the following to test functions..."
+echo "   test/hello local"
+echo "   test/post local"
+echo ""
+echo "Use any of the following commands to manage docker container..."
 echo "   lbin/start"
 echo "   lbin/stop"
 echo "   lbin/bash"
