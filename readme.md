@@ -1,6 +1,7 @@
 # Docs
 
 ## todos
+* get lbin/run to use local code volume
 * setup pytest unit testing
 * should we use the locally built image and upload to gcloud?
     * gcloud beta run deploy [SERVICE_NAME] --image gs://[BUCKET_NAME]/[IMAGE_NAME]

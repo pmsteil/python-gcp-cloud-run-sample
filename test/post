@@ -1,3 +1,6 @@
+# run test cases for post api urls
+clear
+
 #error if not $1 passed
 if [ -z "$1" ]; then
     echo "ERROR: Please pass 'local' or 'remote' as first argument"
@@ -12,11 +15,22 @@ elif [ "$1" = "remote" ]; then
     service=$1    
 fi
 
-echo "Calling $baseuri/pubSubProcessBCImport"
-curl $baseuri/pubSubProcessBCImport \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"message": {
-    "product_id": "12345",
-    "catalog_id": "54321"
-  }}'
+# define an array of uri's to test
+declare -a uris=(    
+    "pubSubProcessBCImport"
+    "postTest"
+)
+
+# loop through the array posting to each uri
+for uri in "${uris[@]}"
+do
+    echo "------------------ Calling $baseuri/$uri ------------------"
+    curl $baseuri/$uri \
+      -X POST \
+      -H "Content-Type: application/json" \
+      -d '{"message": {
+        "product_id": "12345",
+        "catalog_id": "54321"
+      }}'
+      echo
+done

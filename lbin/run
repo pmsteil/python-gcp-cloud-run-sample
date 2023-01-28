@@ -50,13 +50,6 @@ fi
 
 
 
-echo "----------------------------------------------------------------------------"
-echo "| Logs from docker run                                                     |"
-echo "----------------------------------------------------------------------------"
-
-# use docker commands to show last logs
-docker logs $container_id
-
 
 
 
@@ -101,4 +94,12 @@ echo "   lbin/log"
 
 
 
+
+echo "----------------------------------------------------------------------------"
+echo "| Logs from docker run                                                     |"
+echo "----------------------------------------------------------------------------"
+# sleep 1
+# use docker commands to show last logs
+# docker logs $container_id --details --tail=all
+lbin/log
 

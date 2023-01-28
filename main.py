@@ -2,7 +2,9 @@ import os
 import time
 import random
 
-from flask import Flask
+import json
+# import Service
+from flask import Flask, render_template,jsonify,request
 
 
 from google.cloud import pubsub_v1
@@ -39,6 +41,32 @@ def hello( ):
 
 
 
+# create a route for a form api call which receives a post request from a form
+@app.route("/postTest", methods=["POST"])
+def form():    
+        
+    if request.method == "POST":
+        print( "request.method: {}".format(request.method) )
+    
+
+    data = json.loads(request.data)
+
+    product_id = data['message']['product_id']
+    catalog_id = data['message']['catalog_id']
+
+    returndata = "product_id: {}, catalog_id: {}\n".format( product_id, catalog_id )
+    print( "received ==> " + returndata )
+        
+
+    # return the data
+    return( returndata )
+
+
+
+
+
+
+
 
 #-------------------------------------------------------
 # api route for pubSubProcessBCImport
@@ -47,29 +75,27 @@ def hello( ):
 #    
 #-------------------------------------------------------
 @app.route("/pubSubProcessBCImport", methods=['POST'])
-def pubSubProcessBCImport(request=None, message=None):
+def pubSubProcessBCImport():
 
+    if request.method == "POST":
+        print( "request.method: {}".format(request.method) )
+
+    data = json.loads(request.data)
+
+    product_id = data['message']['product_id']
+    catalog_id = data['message']['catalog_id']
+
+    returndata = "product_id: {}, catalog_id: {}\n".format( product_id, catalog_id )
+    print( "received ==> " + returndata )
+
+
+    
     # name = os.environ.get("ENVIRONMENT", "STAGING")
 
     # if request is None: return an error 500
     if request is None:
         return "Error: `request` not received\n", 500
-    
-    
-    # print request variables
-    print("request: {}".format(request))
-    print("message: {}".format(message))
-    # print("request.args: {}".format(request.args))
-    # print("request.form: {}".format(request.form))
-    # print("request.data: {}".format(request.data))
-    # print("request.headers: {}".format(request.headers))
-    # print("request.message: {}".format(request.message))
-    # print("request.method: {}".format(request.method))
-    # print("request.url: {}".format(request.url))
-
-    
-    # message_data = message.data 
-    # print("Received message: {}".format(message_data)) 
+            
     
     # track time of execution of this function    
     start = time.time()
@@ -89,10 +115,10 @@ def pubSubProcessBCImport(request=None, message=None):
         if random.randint(0,1) == 0:
             return "Error: BCImport 'random' failure\n", 500
 
-    return "BCImport completed [{}s]\n".format(end - start)
+    return "BCImport completed [{}s] {}\n".format(end - start, returndata)
 
 # add api route to be called by pubSub to process BCImport messages
-app.add_url_rule("/pubSubProcessBCImport", "pubSubProcessBCImport", pubSubProcessBCImport, methods=["POST"])
+# app.add_url_rule("/pubSubProcessBCImport", "pubSubProcessBCImport", pubSubProcessBCImport, methods=["POST"])
 
 
 
@@ -222,7 +248,6 @@ def perfTest100M():
         
     
     return "PY perfTest100M completed [{}s]\n".format(end - start)
-
 
 
 
