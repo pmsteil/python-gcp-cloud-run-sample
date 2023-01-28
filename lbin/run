@@ -1,0 +1,97 @@
+# docker-run.sh
+clear
+
+image_name=docker-brandx-api-py
+
+
+
+
+
+
+echo "----------------------------------------------------------------------------"
+echo "| Building docker image locally...                                         |"
+
+# if first arg is "nocache" then build with --no-cache
+if [ "$1" = "nocache" ]; then
+    echo "Building with --no-cache"
+    echo "----------------------------------------------------------------------------"
+    docker build --no-cache -t $image_name .
+else
+    echo "----------------------------------------------------------------------------"
+    docker build -t $image_name .
+fi
+
+
+
+
+
+
+
+echo "----------------------------------------------------------------------------"
+echo "| Running docker image locally...                                          |"
+echo "----------------------------------------------------------------------------"
+# run docker in detached mode and map port 8080 to 8080 and get container id
+container_id=$(docker run -d -p 8080:8080 $image_name)
+if [ $? -ne 0 ]; then
+    echo "ERROR: docker run failed, exiting..."
+    exit 1
+fi
+
+# echo "----------------------------------------------------------------------------"
+# echo "| container id: $container_id"
+# echo "----------------------------------------------------------------------------"
+
+
+
+
+
+
+echo "----------------------------------------------------------------------------"
+echo "| Logs from docker run                                                     |"
+echo "----------------------------------------------------------------------------"
+
+# use docker commands to show last logs
+docker logs $container_id
+
+
+
+
+
+
+
+# generate local scripts to start, stop, and bash into container
+
+mkdir -p lbin
+startcmd="lbin/start"
+echo "# generated $startcmd" > $startcmd
+echo "docker run -d -p 8080:8080 $image_name" >> $startcmd
+chmod +x $startcmd
+
+stopcmd="lbin/stop"
+echo "# generated $stopcmd" > $stopcmd
+echo "docker stop $container_id" >> $stopcmd
+chmod +x $stopcmd
+
+bashcmd="lbin/bash"
+echo "# generated $bashcmd" > $bashcmd
+echo "docker exec -it $container_id /bin/bash \$1" >> $bashcmd
+chmod +x $bashcmd
+
+logscmd="lbin/log"
+echo "# generated $logscmd" > $logscmd
+echo "docker logs --follow $container_id" >> $logscmd
+chmod +x $logscmd
+
+
+
+echo "Use any of the following commands..."
+echo "   ./test-post.sh local"
+echo "   lbin/start"
+echo "   lbin/stop"
+echo "   lbin/bash"
+echo "   lbin/log"
+
+
+
+
+

@@ -1,0 +1,2 @@
+# generated lbin/bash
+docker exec -it 99e4697fa12673be21fa350ce73b903b58f0a1a86d31eec068571351c4b91991 /bin/bash $1

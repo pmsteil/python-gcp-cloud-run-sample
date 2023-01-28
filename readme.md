@@ -1,7 +1,13 @@
 # Docs
 
+## todos
+* setup pytest unit testing
+* should we use the locally built image and upload to gcloud?
+
 ## local testing
-    python3 main.py
+    <!-- python3 main.py -->
+    local/run
+    local/test local
     
     ./benchmarks.sh local 10 0 1
 

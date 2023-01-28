@@ -53,7 +53,7 @@ def pubSubProcessBCImport(request=None, message=None):
 
     # if request is None: return an error 500
     if request is None:
-        return "Error: request not received\n", 500
+        return "Error: `request` not received\n", 500
     
     
     # print request variables
