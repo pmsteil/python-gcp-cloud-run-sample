@@ -1,0 +1,2 @@
+# generated lbin/logs
+docker logs --follow 8fa721fce527d97c0c84ddd3e1e1e8adb3ace06ae46a3b67c817cd482618ba5d

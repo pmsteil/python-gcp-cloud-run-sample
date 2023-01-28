@@ -1,0 +1,50 @@
+# creates all topics and subscriptions for the project
+
+# define urls for each service
+catalog_uri=https://docker-brandx-api-py-jflup3ylrq-wn.a.run.app
+bc_uri=https://docker-brandx-api-py-jflup3ylrq-wn.a.run.app
+mi9_uri=https://docker-brandx-api-py-jflup3ylrq-wn.a.run.app
+log_uri=https://docker-brandx-api-py-jflup3ylrq-wn.a.run.app
+
+
+
+# create topics
+echo "Creating topics..."
+gcloud pubsub topics create check_catalogs 2> /dev/null
+gcloud pubsub topics create queue_up_catalog_products 2> /dev/null
+gcloud pubsub topics create queue_up_catalog_report 2> /dev/null
+gcloud pubsub topics create bcimport 2> /dev/null
+gcloud pubsub topics create bcsync 2> /dev/null
+gcloud pubsub topics create bcimage 2> /dev/null
+gcloud pubsub topics create mi9import 2> /dev/null
+gcloud pubsub topics create import_log 2> /dev/null
+gcloud pubsub topics create xdb_log 2> /dev/null
+
+
+read -p "Topics created... Press enter to continue..."
+
+
+
+
+# create catalog subscriptions
+# gcloud pubsub subscriptions delete sub_check_catalogs sub_queue_up_catalog_products sub_queue_up_catalog_report sub_bcimport sub_bcsync sub_bcimage sub_mi9import sub_import_log sub_xdb_log
+
+echo "Creating subscriptions..."
+gcloud pubsub subscriptions create sub_check_catalogs --topic check_catalogs --push-endpoint                        $catalog_uri/process_check_catalogs 2> /dev/null
+gcloud pubsub subscriptions create sub_queue_up_catalog_products --topic queue_up_catalog_products --push-endpoint  $catalog_uri/process_queue_up_catalog_products 2> /dev/null
+gcloud pubsub subscriptions create sub_queue_up_catalog_report --topic queue_up_catalog_report --push-endpoint      $catalog_uri/process_queue_up_catalog_report 2> /dev/null
+
+# create bc subscriptions
+gcloud pubsub subscriptions create sub_bcimport --topic bcimport --push-endpoint    $bc_uri/process_bcimport 2> /dev/null
+gcloud pubsub subscriptions create sub_bcsync --topic bcsync --push-endpoint        $bc_uri/process_bcsync 2> /dev/null
+gcloud pubsub subscriptions create sub_bcimage --topic bcimage --push-endpoint      $bc_uri/process_bcimage 2> /dev/null
+
+# create mi9 subscriptions
+gcloud pubsub subscriptions create sub_mi9import --topic mi9import --push-endpoint  $mi9_uri/process_mi9import 2> /dev/null
+
+# create log subscriptions
+gcloud pubsub subscriptions create sub_import_log --topic import_log --push-endpoint    $log_uri/process_import_log 2> /dev/null
+gcloud pubsub subscriptions create sub_xdb_log --topic xdb_log --push-endpoint          $log_uri/process_xdb_log 2> /dev/null
+
+echo "Subscriptions created..."
+

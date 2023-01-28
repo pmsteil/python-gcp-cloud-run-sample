@@ -4,30 +4,47 @@ import random
 
 import json
 # import Service
-from flask import Flask, render_template,jsonify,request
 
+# import inspect for function introspection
+import inspect
 
 from google.cloud import pubsub_v1
-# from concurrent.futures import TimeoutError
-
-# get environment variable for project_id
-project_id = os.environ.get("PROJECT_ID", "project_id")
 
 
+# load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+
+# load environment variables
+PROJECT_ID                  = os.getenv('PROJECT_ID')
+FLAG_ADD_RANDOM_DELAY       = bool(int(os.getenv('FLAG_ADD_RANDOM_DELAY')))
+FLAG_RETURN_RANDOM_ERRORS   = bool(int(os.getenv('FLAG_RETURN_RANDOM_ERRORS')))
+print( f"Server started - project_id: {PROJECT_ID}" )
+print( f"FLAG_ADD_RANDOM_DELAY: {FLAG_ADD_RANDOM_DELAY}" )
+print( f"FLAG_RETURN_RANDOM_ERRORS: {FLAG_RETURN_RANDOM_ERRORS}" )
 
 
+
+# authenticdate with google cloud
+# https://cloud.google.com/docs/authentication/getting-started
+# https://cloud.google.com/docs/authentication/production
+# https://cloud.google.com/docs/authentication/production#auth-cloud-implicit-python
+# https://cloud.google.com/docs/authentication/production#auth-cloud-explicit-python
+# pip3 install google-cloud-logging
+# from google.cloud import logging
+# logging_client = logging.Client()
+# logger = logging_client.logger('my-log')
+# logger.log_text('SERVER STARTED!')
+
+
+
+from flask import Flask,request
 app = Flask(__name__)
 
 
 
 
 
-
-
-@app.route("/")
-def root():
-    name = os.environ.get("NAME", "World")
-    return "Hello {}!".format(name)
 
 
 
@@ -45,117 +62,83 @@ def hello( ):
 
 
 
-# create a route for a form api call which receives a post request from a form
-@app.route("/postTest", methods=["POST"])
-def form():    
-        
-    if request.method == "POST":
-        print( "request.method: {}".format(request.method) )
-    
-
-    data = json.loads(request.data)
-
-    product_id = data['message']['product_id']
-    catalog_id = data['message']['catalog_id']
-
-    returndata = "product_id: {}, catalog_id: {}\n".format( product_id, catalog_id )
-    print( "received ==> " + returndata )
-        
-
-    # return the data
-    return( returndata )
 
 
+# process_check_catalogs
+# process_queue_up_catalog_products
+# process_queue_up_catalog_report
 
+# process_bcimport
+# process_bcsync
+# process_bcimage
 
+# process_mi9import
 
+# process_import_log
+# process_xdb_log
 
 
 
 #-------------------------------------------------------
-# api route for pubSubProcessBCImport
-#
-#    https://cloud.google.com/pubsub/docs/samples/pubsub-create-push-subscription#pubsub_create_push_subscription-python
-#    
+# API endpoint: /process_bcimport
+#    This endpoint will have messages pushed to it
+#    by the pubsub topic called `bcimport`
 #-------------------------------------------------------
-@app.route("/pubSubProcessBCImport", methods=['POST'])
-def pubSubProcessBCImport():
+@app.route("/process_bcimport", methods=['POST'])
+def process_bcimport():
 
-    if request.method == "POST":
-        print( "request.method: {}".format(request.method) )
-
-    data = json.loads(request.data)
-
-    product_id = data['message']['product_id']
-    catalog_id = data['message']['catalog_id']
-
-    returndata = "product_id: {}, catalog_id: {}\n".format( product_id, catalog_id )
-    print( "received ==> " + returndata )
-
-
-    
-    # name = os.environ.get("ENVIRONMENT", "STAGING")
-
-    # if request is None: return an error 500
-    if request is None:
-        return "Error: `request` not received\n", 500
-            
-    
-    # track time of execution of this function    
+    # track time of execution of this function
     start = time.time()
+   
+    api_name = inspect.currentframe().f_code.co_name + "::"
+   
+    # pull the posted data from the request
+    data = json.loads(request.data)
 
+    # if product_id is not in the data, return an error
+    if 'product_id' not in data['message']:
+        return "Error: `product_id` not received\n", 500
+    
+    if 'catalog_id' not in data['message']:
+        return "Error: `catalog_id` not received\n", 500
 
+    # retrieve the fields from the data
+    product_id = data['message']['product_id']
+    catalog_id = data['message']['catalog_id']
+
+    # format the return data    
+    returndata = f"product_id: {product_id}, catalog_id: {catalog_id}"
+    print( f"{api_name}received ==> {returndata}" )
 
 
     # wait for a random time between 1 and 5 seconds
-    if( 0 ):
+    if( FLAG_ADD_RANDOM_DELAY ):
+        print( f"{api_name}random delay added: {FLAG_ADD_RANDOM_DELAY}" )
         time.sleep(random.randint(1,4))
-    
-
-    end = time.time()
+        
     
     # flip a coin to determine if we should return an error
-    if( 0 ):
+    if( FLAG_RETURN_RANDOM_ERRORS ):
         if random.randint(0,1) == 0:
+            print( f"{api_name}random error tripped {FLAG_RETURN_RANDOM_ERRORS}" )
             return "Error: BCImport 'random' failure\n", 500
 
-    return "BCImport completed [{}s] {}\n".format(end - start, returndata)
-
-# add api route to be called by pubSub to process BCImport messages
-# app.add_url_rule("/pubSubProcessBCImport", "pubSubProcessBCImport", pubSubProcessBCImport, methods=["POST"])
-
-
-
-
-
-
-#-------------------------------------------------------
-# api route for ProcessMi9Import
-#-------------------------------------------------------
-@app.route("/pubSubProcessMi9Import")
-def pubSubProcessMi9Import():
-    # track time of execution of this function
-    
-    start = time.time()
-
-    # name = os.environ.get("ENVIRONMENT", "STAGING")
-
-    # wait for a random time between 1 and 3 seconds
-    time.sleep(random.randint(1,3))
     end = time.time()
+    
 
-    # flip a coin to determine if we should return an error
-    if random.randint(0,1) == 0:
-        return "Error: Mi9Import 'random' failure\n", 500
+    return "{}completed [{}s] {}\n".format( api_name, end - start, returndata)
 
-    return "Mi9Import completed [{}s]\n".format(end - start)
+
 
 
 
 #-------------------------------------------------------
 # api route for createPubSubMessages
+#
+#    https://cloud.google.com/pubsub/docs/samples/pubsub-create-push-subscription#pubsub_create_push_subscription-python
+#    
 #-------------------------------------------------------
-@app.route("/createPubSubMessages")
+@app.route("/createPubSubMessages", methods=['POST'])
 def createPubSubMessages():
     
         
@@ -165,20 +148,40 @@ def createPubSubMessages():
     publisher = pubsub_v1.PublisherClient()
     # The `topic_path` method creates a fully qualified identifier
     # in the form `projects/{project_id}/topics/{topic_id}`
-    topic_path = publisher.topic_path(project_id, topic_id)
+    topic_path = publisher.topic_path(PROJECT_ID, topic_id)
 
     for n in range(1, 10):
-        data = f"Python message number {published_messages}"
-        # Data must be a bytestring
-        data = data.encode("utf-8")
-        # When you publish a message, the client returns a future.
-        future = publisher.publish(topic_path, data)
-        published_messages += 1
-        # print(future)
-        print(future.result())
+        data = f"Test message number {published_messages}"
+        _queueMessage( topic_id, data )
+
+        # # Data must be a bytestring
+        # data = data.encode("utf-8")
+        # # When you publish a message, the client returns a future.
+        # future = publisher.publish(topic_path, data)
+        # published_messages += 1
+        # # print(future)
+        # print(future.result())
 
     return "Published {} messages to {}.\n".format( published_messages, topic_path )
 
+
+
+def _queueMessage( topic_id, message ): 
+    
+    publisher = pubsub_v1.PublisherClient()
+    # The `topic_path` method creates a fully qualified identifier
+    # in the form `projects/{project_id}/topics/{topic_id}`
+    topic_path = publisher.topic_path(PROJECT_ID, topic_id)
+        
+    # Data must be a bytestring
+    message = message.encode("utf-8")
+    # When you publish a message, the client returns a future.
+    future = publisher.publish(topic_path, message )
+    message_id = future.result();    
+    
+    print( "_queueMessage( message_id {} on {}).\n".format( message_id, topic_id ) )
+
+    return( message_id )
 
 
 

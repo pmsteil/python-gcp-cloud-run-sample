@@ -1,0 +1,71 @@
+# deploy.sh
+clear
+
+# prebuld checks
+echo
+echo "----------------------------------------------------------------------------"
+echo "| Precompiling...                                                          |"
+echo "----------------------------------------------------------------------------"
+
+pyflakes=$(pyflakes main.py)
+
+# if pyflakes returns an error, exit
+if [ $? -ne 0 ]; then        
+    echo "| ERROR pyflakes syntax check failed, please resolve errors and try again..."
+    echo "----------------------------------------------------------------------------"
+    echo "| $pyflakes"
+    echo "----------------------------------------------------------------------------"
+
+    exit 1
+else
+    echo "| passed...                                                                |"
+    echo "----------------------------------------------------------------------------"
+fi
+
+
+
+
+
+
+project_id=`gcloud config get-value project`
+region=us-west4
+# imagename=image_brandx-api-py
+# repo=cloud-run-source-deploy
+# repopath=$region-docker.pkg.dev/$project_id/$repo
+# image_fq=$repopath/$imagename
+
+echo
+echo "----------------------------------------------------------------------------"
+echo "| Rebuilding requirements.txt...                                           |"
+echo "----------------------------------------------------------------------------"
+pip3 freeze > requirements.txt
+
+echo
+echo "----------------------------------------------------------------------------"
+echo "| Buiding image and deploying...                                           |"
+echo "----------------------------------------------------------------------------"
+gcloud run deploy docker-brandx-api-py --source . --region $region --allow-unauthenticated --platform managed --memory 512Mi --cpu 2 --concurrency=80 --min-instances 0 --max-instances 5 --execution-environment=gen2 --set-env-vars "PROJECT_ID=$project_id" --format=json
+
+# --image gcr.io/$project_id/docker-brandx-api-py
+
+
+# These flags modify the Cloud SQL instances this Service connects to. You
+#        can specify a name of a Cloud SQL instance if it's in the same project
+#        and region as your Cloud Run service; otherwise specify
+#        <project>:<region>:<instance> for the instance.
+
+#        At most one of these can be specified:
+
+#          --add-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
+#             Append the given values to the current Cloud SQL instances.
+
+#          --clear-cloudsql-instances
+#             Empty the current Cloud SQL instances.
+
+#          --remove-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
+#             Remove the given values from the current Cloud SQL instances.
+
+#          --set-cloudsql-instances=[CLOUDSQL-INSTANCES,...]
+#             Completely replace the current Cloud SQL instances with the given
+#             values.
+

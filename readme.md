@@ -1,6 +1,7 @@
 # Docs
 
 ## todos
+* get local/run to authenticate with google
 * get lbin/run to use local code volume
 * setup pytest unit testing
 * should we use the locally built image and upload to gcloud?
@@ -37,10 +38,10 @@
 * gcloud auth application-default login
 * gcloud services enable pubsub.googleapis.com
 * pip install --upgrade google-cloud-pubsub
+* gcloud services enable cloudprofiler.googleapis.com
 
 
 ## pubsub commands
-* gcloud services enable cloudprofiler.googleapis.com
 * gcloud pubsub topics create test-topic
 * gcloud pubsub subscriptions list
 * gcloud pubsub subscriptions create py-test-subscription --topic test-topic

@@ -1,0 +1,3 @@
+# not working yet...
+
+ gcloud logging read "resource.type=container AND resource.labels.container_name=docker-brandx-api-py"

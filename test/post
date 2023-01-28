@@ -16,9 +16,10 @@ elif [ "$1" = "remote" ]; then
 fi
 
 # define an array of uri's to test
+# "createPubSubMessages"
 declare -a uris=(    
-    "pubSubProcessBCImport"
-    "postTest"
+    "process_bcimport"    
+    
 )
 
 # loop through the array posting to each uri
