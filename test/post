@@ -16,16 +16,18 @@ elif [ "$1" = "remote" ]; then
 fi
 
 # define an array of uri's to test
-# "createPubSubMessages"
 declare -a uris=(    
     "process_bcimport"    
+    "createPubSubMessages?topic_id=bcimport&message_count=1000"
     
 )
 
 # loop through the array posting to each uri
 for uri in "${uris[@]}"
 do
-    echo "------------------ Calling $baseuri/$uri ------------------"
+    echo "-----------------------------------------------------------"
+    echo "| Calling $baseuri/$uri"
+    echo "-----------------------------------------------------------"
     curl $baseuri/$uri \
       -X POST \
       -H "Content-Type: application/json" \

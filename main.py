@@ -19,6 +19,7 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 PROJECT_ID                  = os.getenv('PROJECT_ID')
 FLAG_ADD_RANDOM_DELAY       = bool(int(os.getenv('FLAG_ADD_RANDOM_DELAY')))
 FLAG_RETURN_RANDOM_ERRORS   = bool(int(os.getenv('FLAG_RETURN_RANDOM_ERRORS')))
+
 print( f"Server started - project_id: {PROJECT_ID}" )
 print( f"FLAG_ADD_RANDOM_DELAY: {FLAG_ADD_RANDOM_DELAY}" )
 print( f"FLAG_RETURN_RANDOM_ERRORS: {FLAG_RETURN_RANDOM_ERRORS}" )
@@ -95,12 +96,16 @@ def process_bcimport():
     # pull the posted data from the request
     data = json.loads(request.data)
 
+
+
     # if product_id is not in the data, return an error
     if 'product_id' not in data['message']:
-        return "Error: `product_id` not received\n", 500
+        #return "skipping product_id missing...\n", 201
+        return "Error: `product_id` not received\n", 501
     
     if 'catalog_id' not in data['message']:
-        return "Error: `catalog_id` not received\n", 500
+        #return "skipping catalog_id missing...\n", 201
+        return "Error: `catalog_id` not received\n", 502
 
     # retrieve the fields from the data
     product_id = data['message']['product_id']
@@ -121,12 +126,12 @@ def process_bcimport():
     if( FLAG_RETURN_RANDOM_ERRORS ):
         if random.randint(0,1) == 0:
             print( f"{api_name}random error tripped {FLAG_RETURN_RANDOM_ERRORS}" )
-            return "Error: BCImport 'random' failure\n", 500
+            return "Error: BCImport 'random' failure\n", 503
 
     end = time.time()
     
 
-    return "{}completed [{}s] {}\n".format( api_name, end - start, returndata)
+    return "{}completed [{}s] {}\n".format( api_name, end - start, returndata), 200
 
 
 
@@ -135,34 +140,42 @@ def process_bcimport():
 #-------------------------------------------------------
 # api route for createPubSubMessages
 #
-#    https://cloud.google.com/pubsub/docs/samples/pubsub-create-push-subscription#pubsub_create_push_subscription-python
+#    /createPubSubMessages?topic_id=bcimport&message_count=10
 #    
 #-------------------------------------------------------
 @app.route("/createPubSubMessages", methods=['POST'])
-def createPubSubMessages():
-    
-        
-    topic_id = "test-topic"
+def createPubSubMessages( topic_id="", message_count=""):
+
+    # track time of execution of this function
+    start = time.time()
     published_messages = 0 
 
-    publisher = pubsub_v1.PublisherClient()
-    # The `topic_path` method creates a fully qualified identifier
-    # in the form `projects/{project_id}/topics/{topic_id}`
-    topic_path = publisher.topic_path(PROJECT_ID, topic_id)
+    # check for required parameters
+    if 'topic_id' not in request.args:
+        return "Error: `topic_id` required (ex: bcimport)\n", 500
 
-    for n in range(1, 10):
-        data = f"Test message number {published_messages}"
+    if 'message_count' not in request.args:
+        return "Error: `message_count` required (ex: 20)\n", 500
+
+    topic_id        = request.args.get("topic_id")
+    message_count   = request.args.get("message_count")
+        
+    data = '{"message": {"product_id": "12345","catalog_id": "54321"}}'
+
+    for n in range(0, int(message_count)):        
         _queueMessage( topic_id, data )
+        published_messages += 1
 
-        # # Data must be a bytestring
-        # data = data.encode("utf-8")
-        # # When you publish a message, the client returns a future.
-        # future = publisher.publish(topic_path, data)
-        # published_messages += 1
-        # # print(future)
-        # print(future.result())
+    # track time of execution of this function
+    end = time.time()
 
-    return "Published {} messages to {}.\n".format( published_messages, topic_path )
+    return_data = f"Queued {published_messages} messages to [{topic_id}] in {end-start}s.\n"
+    print( return_data )
+        
+    return return_data
+
+
+
 
 
 
@@ -171,12 +184,12 @@ def _queueMessage( topic_id, message ):
     publisher = pubsub_v1.PublisherClient()
     # The `topic_path` method creates a fully qualified identifier
     # in the form `projects/{project_id}/topics/{topic_id}`
-    topic_path = publisher.topic_path(PROJECT_ID, topic_id)
+    # topic_path = publisher.topic_path(PROJECT_ID, topic_id)
         
     # Data must be a bytestring
-    message = message.encode("utf-8")
+    # message = message.encode("utf-8")
     # When you publish a message, the client returns a future.
-    future = publisher.publish(topic_path, message )
+    future = publisher.publish( publisher.topic_path(PROJECT_ID, topic_id), message.encode("utf-8") )
     message_id = future.result();    
     
     print( "_queueMessage( message_id {} on {}).\n".format( message_id, topic_id ) )

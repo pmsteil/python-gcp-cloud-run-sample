@@ -44,10 +44,10 @@ echo
 echo "----------------------------------------------------------------------------"
 echo "| Buiding image and deploying...                                           |"
 echo "----------------------------------------------------------------------------"
-gcloud run deploy docker-brandx-api-py --source . --region $region --allow-unauthenticated --platform managed --memory 512Mi --cpu 2 --concurrency=80 --min-instances 0 --max-instances 5 --execution-environment=gen2 --set-env-vars "PROJECT_ID=$project_id" --format=json
+gcloud run deploy docker-brandx-api-py --source . --region $region --allow-unauthenticated --platform managed --execution-environment=gen2 --memory 512Mi --cpu 2 --concurrency=20 --min-instances 0 --max-instances 5  --set-env-vars "PROJECT_ID=$project_id" --set-env-vars "FLAG_ADD_RANDOM_DELAY=0" --set-env-vars "FLAG_RETURN_RANDOM_ERRORS=0" 
 
 # --image gcr.io/$project_id/docker-brandx-api-py
-
+# --format=json
 
 # These flags modify the Cloud SQL instances this Service connects to. You
 #        can specify a name of a Cloud SQL instance if it's in the same project
